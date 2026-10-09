@@ -32,7 +32,6 @@ async function carregarDadosDoBanco() {
     const data = await res.json();
     estadoLocal.numeros = data.record.numeros || [];
     
-    // Garante ordenação crescente inicial
     estadoLocal.numeros.sort((a, b) => a - b);
     
     renderizarLista(); // <-- Alterado de renderizarCartelas() para renderizarLista()
