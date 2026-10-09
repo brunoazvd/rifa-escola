@@ -13,7 +13,10 @@
   </header>
 
   <main class="container">
-    <!-- Métrica Rápida -->
+    <!-- Indicador de status de sincronização -->
+    <div id="status-rede">Sincronizando...</div>
+
+    <!-- Métricas Rápidas -->
     <section class="stats">
       <div class="card-stat">
         <span class="label">Total Vendido</span>
@@ -25,15 +28,6 @@
       </div>
     </section>
 
-    <!-- Controle de Backup -->
-    <div class="backup-actions">
-      <button onclick="exportarBackup()" class="btn-secundario">💾 Baixar Backup (JSON)</button>
-      <label class="btn-secundario custom-file-upload">
-        <input type="file" onchange="importarBackup(event)" accept=".json">
-        📂 Restaurar Backup
-      </label>
-    </div>
-
     <!-- Abas de Navegação -->
     <nav class="tabs">
       <button class="tab-btn active" onclick="mudarAba('baixa')">Dar Baixa nos Números</button>
@@ -42,8 +36,24 @@
 
     <!-- ABA 1: DAR BAIXA -->
     <section id="aba-baixa" class="aba-conteudo active">
-      <h2>Selecione a Cartela / Funcionário</h2>
-      <div id="grid-cartelas" class="grid-cartelas"></div>
+      <!-- Formulário de Entrada -->
+      <div class="painel-input">
+        <form id="form-adicionar" onsubmit="adicionarNumero(event)">
+          <input type="number" id="input-numero" placeholder="Digite o número (1-100)" min="1" max="100" required autofocus>
+          <button type="submit" class="btn-principal">Adicionar Número</button>
+        </form>
+      </div>
+
+      <!-- Campo de Busca -->
+      <div class="painel-busca">
+        <input type="text" id="input-busca" placeholder="🔍 Buscar número cadastrado..." oninput="filtrarNumeros()">
+      </div>
+
+      <!-- Lista de Números Vendidos -->
+      <div class="lista-header">
+        <h3>Números Cadastrados (Ordem Crescente)</h3>
+      </div>
+      <div id="container-numeros" class="grid-tags"></div>
     </section>
 
     <!-- ABA 2: SORTEIO -->

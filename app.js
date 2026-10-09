@@ -10,37 +10,20 @@ const URL_BIN = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 // ESTRUTURA E CONFIGURAÇÕES DA RIFA
 // ==========================================
 const VALOR_NUMERO = 5;
-const TOTAL_CARTELAS = 10; // 10 cartelas de 10 números (1 a 100)
-
 // Estado local da aplicação
 let estadoLocal = {
-  numeros: [] // Guarda apenas o array de números vendidos/pagos
+  numeros: []
 };
 
-// Mapeamento fixo de cartelas e faixas para facilitar renderização
-const cartelasEstaticas = Array.from({ length: TOTAL_CARTELAS }, (_, i) => {
-  const inicio = i * 10 + 1;
-  return {
-    id: i + 1,
-    faixa: `${inicio}-${inicio + 9}`,
-    inicio: inicio,
-    fim: inicio + 9
-  };
-});
-
 // ==========================================
-// INTEGRAÇÃO COM A API DO JSONBIN.IO
+// INTEGRAÇÃO COM O JSONBIN.IO
 // ==========================================
-
-// Lê os dados do banco na nuvem
 async function carregarDadosDoBanco() {
   mostrarStatus("Carregando dados da nuvem...");
   try {
     const res = await fetch(`${URL_BIN}/latest`, {
       method: 'GET',
-      headers: {
-        'X-Master-Key': API_KEY
-      }
+      headers: { 'X-Master-Key': API_KEY }
     });
 
     if (!res.ok) throw new Error("Erro ao buscar dados do JSONBin");
@@ -48,18 +31,20 @@ async function carregarDadosDoBanco() {
     const data = await res.json();
     estadoLocal.numeros = data.record.numeros || [];
     
-    renderizarCartelas();
+    // Garante ordenação crescente inicial
+    estadoLocal.numeros.sort((a, b) => a - b);
+    
+    renderizarLista();
     atualizarStats();
     mostrarStatus("Sincronizado!", "sucesso");
   } catch (err) {
     console.error(err);
-    mostrarStatus("Erro ao conectar com o banco de dados.", "erro");
+    mostrarStatus("Erro ao conectar com a nuvem.", "erro");
   }
 }
 
-// Salva o array atualizado de números no JSONBin
 async function salvarDadosNoBanco() {
-  mostrarStatus("Salvando alterações na nuvem...");
+  mostrarStatus("Salvando alterações...");
   try {
     const res = await fetch(URL_BIN, {
       method: 'PUT',
@@ -70,84 +55,102 @@ async function salvarDadosNoBanco() {
       body: JSON.stringify({ numeros: estadoLocal.numeros })
     });
 
-    if (!res.ok) throw new Error("Erro ao salvar dados no JSONBin");
+    if (!res.ok) throw new Error("Erro ao salvar no JSONBin");
 
     atualizarStats();
     mostrarStatus("Sincronizado!", "sucesso");
   } catch (err) {
     console.error(err);
-    mostrarStatus("Erro ao salvar dados na nuvem.", "erro");
+    mostrarStatus("Erro ao salvar dados.", "erro");
   }
 }
 
-// Mensagem discreta no topo para status de rede
 function mostrarStatus(mensagem, tipo = "info") {
-  let el = document.getElementById('status-rede');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'status-rede';
-    document.body.prepend(el);
-  }
+  const el = document.getElementById('status-rede');
   el.innerText = mensagem;
   el.className = `status-${tipo}`;
 }
 
 // ==========================================
-// LÓGICA DE INTERFACE E EVENTOS
+// LÓGICA DE INTERFACE
 // ==========================================
-
 function atualizarStats() {
   const totalVendidos = estadoLocal.numeros.length;
   document.getElementById('stat-vendidos').innerText = `${totalVendidos} / 100`;
   document.getElementById('stat-arrecadado').innerText = `R$ ${(totalVendidos * VALOR_NUMERO).toFixed(2).replace('.', ',')}`;
 }
 
-function renderizarCartelas() {
-  const container = document.getElementById('grid-cartelas');
+function renderizarLista(filtro = '') {
+  const container = document.getElementById('container-numeros');
   container.innerHTML = '';
 
-  cartelasEstaticas.forEach((cartela) => {
-    const div = document.createElement('div');
-    div.className = 'cartela-item';
+  // Filtra por busca se houver algo digitado
+  const numerosExibicao = estadoLocal.numeros.filter(num => 
+    num.toString().includes(filtro.trim())
+  );
 
-    let htmlNumeros = '';
-    for (let num = cartela.inicio; num <= cartela.fim; num++) {
-      const estaPago = estadoLocal.numeros.includes(num);
-      htmlNumeros += `
-        <button class="num-btn ${estaPago ? 'pago' : ''}" onclick="alternarBaixa(${num})">
-          ${num}
-        </button>
-      `;
-    }
+  if (numerosExibicao.length === 0) {
+    container.innerHTML = '<span style="color: #888;">Nenhum número encontrado.</span>';
+    return;
+  }
 
-    div.innerHTML = `
-      <div class="cartela-header">
-        <strong>Cartela (${cartela.faixa})</strong>
-      </div>
-      <div class="numeros-grid">${htmlNumeros}</div>
+  numerosExibicao.forEach(num => {
+    const tag = document.createElement('div');
+    tag.className = 'tag-numero';
+    tag.innerHTML = `
+      <span>${num}</span>
+      <button class="btn-remover" title="Remover número" onclick="removerNumero(${num})">&times;</button>
     `;
-    container.appendChild(div);
+    container.appendChild(tag);
   });
 }
 
-// Alterna baixa de um número e atualiza a nuvem
-async function alternarBaixa(numero) {
-  const index = estadoLocal.numeros.indexOf(numero);
+async function adicionarNumero(event) {
+  event.preventDefault();
+  const input = document.getElementById('input-numero');
+  const num = parseInt(input.value, 10);
 
-  if (index === -1) {
-    // Adiciona número ao array
-    estadoLocal.numeros.push(numero);
-  } else {
-    // Remove número do array
-    estadoLocal.numeros.splice(index, 1);
+  if (isNaN(num) || num < 1 || num > 100) {
+    alert('Digite um número válido entre 1 e 100.');
+    return;
   }
 
-  // Ordena para manter organizado no banco
+  if (estadoLocal.numeros.includes(num)) {
+    alert(`O número ${num} já foi adicionado!`);
+    input.value = '';
+    return;
+  }
+
+  // Adiciona e ordena de forma crescente
+  estadoLocal.numeros.push(num);
   estadoLocal.numeros.sort((a, b) => a - b);
 
-  // Atualiza a tela imediatamente para resposta rápida e envia ao banco
-  renderizarCartelas();
+  input.value = '';
+  input.focus();
+
+  // Limpa o filtro de busca ao adicionar um novo
+  document.getElementById('input-busca').value = '';
+
+  renderizarLista();
   await salvarDadosNoBanco();
+}
+
+async function removerNumero(num) {
+  if (confirm(`Tem certeza que deseja remover o número ${num}?`)) {
+    const index = estadoLocal.numeros.indexOf(num);
+    if (index !== -1) {
+      estadoLocal.numeros.splice(index, 1);
+      
+      const filtro = document.getElementById('input-busca').value;
+      renderizarLista(filtro);
+      await salvarDadosNoBanco();
+    }
+  }
+}
+
+function filtrarNumeros() {
+  const termo = document.getElementById('input-busca').value;
+  renderizarLista(termo);
 }
 
 function mudarAba(aba) {
@@ -164,13 +167,13 @@ function mudarAba(aba) {
 }
 
 // ==========================================
-// MÓDULO DE SORTEIO
+// SORTEIO
 // ==========================================
 function realizarSorteio() {
   const elegiveis = estadoLocal.numeros;
 
   if (elegiveis.length === 0) {
-    alert('Nenhum número foi baixado/pago até o momento!');
+    alert('Nenhum número cadastrado para o sorteio!');
     return;
   }
 
@@ -190,19 +193,19 @@ function realizarSorteio() {
       clearInterval(intervalo);
       const vencedor = elegiveis[Math.floor(Math.random() * elegiveis.length)];
       visor.innerText = vencedor;
-      
-      // Identifica a cartela correspondente
+
+      // Identifica a faixa de cartela correspondente (ex: 1-10, 11-20)
       const cartelaNum = Math.ceil(vencedor / 10);
       const faixa = `${(cartelaNum - 1) * 10 + 1}-${cartelaNum * 10}`;
 
       resDiv.innerHTML = `
         🏆 Número Sorteado: <strong>${vencedor}</strong><br>
-         Pertence à Cartela: <strong>${faixa}</strong>
+        Pertence à Cartela: <strong>${faixa}</strong>
       `;
       btn.disabled = false;
     }
   }, 100);
 }
 
-// Carrega os dados da nuvem ao abrir a página
+// Inicialização
 window.addEventListener('DOMContentLoaded', carregarDadosDoBanco);

@@ -3,6 +3,7 @@
   --bg: #f4f7f9;
   --card-bg: #ffffff;
   --success: #28a745;
+  --danger: #dc3545;
   --border: #e0e0e0;
 }
 
@@ -25,10 +26,24 @@ header h1 { margin: 0; font-size: 1.5rem; }
 header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9rem; }
 
 .container {
-  max-width: 900px;
+  max-width: 700px;
   margin: 20px auto;
   padding: 0 15px;
 }
+
+#status-rede {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  background-color: #ffe8a1;
+  color: #856404;
+}
+
+#status-rede.status-sucesso { background-color: #d4edda; color: #155724; }
+#status-rede.status-erro { background-color: #f8d7da; color: #721c24; }
 
 .stats {
   display: flex;
@@ -47,23 +62,6 @@ header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9rem; }
 
 .card-stat .label { display: block; font-size: 0.85rem; color: #666; }
 .card-stat .val { font-size: 1.4rem; font-weight: bold; color: var(--primary); }
-
-.backup-actions {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.btn-secundario {
-  background: #e9ecef;
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.custom-file-upload input { display: none; }
 
 .tabs {
   display: flex;
@@ -90,63 +88,86 @@ header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9rem; }
 .aba-conteudo { display: none; }
 .aba-conteudo.active { display: block; }
 
-/* Grid de Cartelas */
-.grid-cartelas {
+/* Entrada e Busca */
+.painel-input form {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.cartela-item {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 15px;
+.painel-input input {
+  flex: 1;
+  padding: 12px;
+  font-size: 1.1rem;
+  border: 2px solid var(--primary);
+  border-radius: 6px;
 }
 
-.cartela-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+.btn-principal {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.cartela-header input {
+.painel-busca input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
   font-size: 0.95rem;
-  padding: 4px 8px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 200px;
+  border-radius: 6px;
+  margin-bottom: 20px;
 }
 
-.numeros-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+/* Lista de Tags de Números */
+.lista-header h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.grid-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  min-height: 80px;
+}
+
+.tag-numero {
+  background: #e9ecef;
+  border: 1px solid #ced4da;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.num-btn {
-  padding: 10px;
-  border: 1px solid #ccc;
-  background: #fff;
-  border-radius: 5px;
+.tag-numero .btn-remover {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.num-btn.pago {
-  background: var(--success);
-  color: white;
-  border-color: var(--success);
+  padding: 0;
+  line-height: 1;
 }
 
 /* Sorteio */
-.sorteio-box {
-  text-align: center;
-  margin: 30px 0;
-}
-
+.sorteio-box { text-align: center; margin: 30px 0; }
 .visor {
   font-size: 4rem;
   font-weight: bold;
@@ -172,29 +193,7 @@ header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.9rem; }
 
 .resultado-box {
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: bold;
   color: var(--success);
-}
-
-#status-rede {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  text-align: center;
-  padding: 6px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  background-color: #ffe8a1;
-  color: #856404;
-}
-
-#status-rede.status-sucesso {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-#status-rede.status-erro {
-  background-color: #f8d7da;
-  color: #721c24;
 }
