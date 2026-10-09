@@ -11,6 +11,7 @@ const URL_BIN = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 // ==========================================
 const VALOR_NUMERO = 5;
 // Estado local da aplicação
+
 let estadoLocal = {
   numeros: []
 };
@@ -34,7 +35,7 @@ async function carregarDadosDoBanco() {
     // Garante ordenação crescente inicial
     estadoLocal.numeros.sort((a, b) => a - b);
     
-    renderizarLista();
+    renderizarLista(); // <-- Alterado de renderizarCartelas() para renderizarLista()
     atualizarStats();
     mostrarStatus("Sincronizado!", "sucesso");
   } catch (err) {
@@ -110,8 +111,8 @@ async function adicionarNumero(event) {
   const input = document.getElementById('input-numero');
   const num = parseInt(input.value, 10);
 
-  if (isNaN(num) || num < 1 || num > 100) {
-    alert('Digite um número válido entre 1 e 100.');
+  if (isNaN(num) || num < 1 || num > 1500) {
+    alert('Digite um número válido entre 1 e 1500.');
     return;
   }
 
