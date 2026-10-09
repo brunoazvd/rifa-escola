@@ -76,7 +76,7 @@ function mostrarStatus(mensagem, tipo = "info") {
 // ==========================================
 function atualizarStats() {
   const totalVendidos = estadoLocal.numeros.length;
-  document.getElementById('stat-vendidos').innerText = `${totalVendidos} / 100`;
+  document.getElementById('stat-vendidos').innerText = `${totalVendidos} / 1500`;
   document.getElementById('stat-arrecadado').innerText = `R$ ${(totalVendidos * VALOR_NUMERO).toFixed(2).replace('.', ',')}`;
 }
 
