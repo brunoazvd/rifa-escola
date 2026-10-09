@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão da Rifa Especial - E.M. Therezinha Pedrosa</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Rifa Especial - Cesta de Chocolates</h1>
+    <p>E. M. THEREZINHA PEDROSA</p>
+  </header>
+
+  <main class="container">
+    <!-- Métrica Rápida -->
+    <section class="stats">
+      <div class="card-stat">
+        <span class="label">Total Vendido</span>
+        <span class="val" id="stat-arrecadado">R$ 0,00</span>
+      </div>
+      <div class="card-stat">
+        <span class="label">Números Pagos</span>
+        <span class="val" id="stat-vendidos">0 / 100</span>
+      </div>
+    </section>
+
+    <!-- Controle de Backup -->
+    <div class="backup-actions">
+      <button onclick="exportarBackup()" class="btn-secundario">💾 Baixar Backup (JSON)</button>
+      <label class="btn-secundario custom-file-upload">
+        <input type="file" onchange="importarBackup(event)" accept=".json">
+        📂 Restaurar Backup
+      </label>
+    </div>
+
+    <!-- Abas de Navegação -->
+    <nav class="tabs">
+      <button class="tab-btn active" onclick="mudarAba('baixa')">Dar Baixa nos Números</button>
+      <button class="tab-btn" onclick="mudarAba('sorteio')">Módulo de Sorteio</button>
+    </nav>
+
+    <!-- ABA 1: DAR BAIXA -->
+    <section id="aba-baixa" class="aba-conteudo active">
+      <h2>Selecione a Cartela / Funcionário</h2>
+      <div id="grid-cartelas" class="grid-cartelas"></div>
+    </section>
+
+    <!-- ABA 2: SORTEIO -->
+    <section id="aba-sorteio" class="aba-conteudo">
+      <h2>Sorteio dos Números Vendidos</h2>
+      <p>Apenas números com baixa confirmada participarão do sorteio.</p>
+      
+      <div class="sorteio-box">
+        <div id="visor-numero" class="visor">?</div>
+        <button id="btn-sortear" onclick="realizarSorteio()" class="btn-destaque">🎉 Realizar Sorteio</button>
+      </div>
+      <div id="resultado-sorteio" class="resultado-box"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
